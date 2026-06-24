@@ -135,4 +135,4 @@ if st.button("Analyze Sentiment"):
                     <div style="color: #a0a5b5;">This customer is feeling neutral. (Score: {compound_score:.2f})</div>
                 </div>
                 """
-            st.markdown(html_str, unsafe_allow_html=True)kdown(html_str, unsafe_allow_html=True)
+            st.markdown(html_str, unsafe_allow_html=True)
