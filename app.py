@@ -96,7 +96,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1>Product Sentiment Analyzer</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Twitter Sentiment Analyzer</h1>", unsafe_allow_html=True)
 st.markdown("<div class='subtitle'>Analyze customer feedback (Positive / Negative / Neutral).</div>", unsafe_allow_html=True)
 
 analyzer = SentimentIntensityAnalyzer()
