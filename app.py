@@ -2,7 +2,7 @@ import streamlit as st
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # Set page config
-st.set_page_config(page_title="Product Sentiment Demo", layout="centered", page_icon="🛍️")
+st.set_page_config(page_title="Twitter Sentiment Demo", layout="centered", page_icon="🛍️")
 
 # Injecting Custom CSS
 st.markdown("""
