@@ -1,35 +1,27 @@
 import streamlit as st
-import pickle
-import re
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # Set page config
-st.set_page_config(page_title="Twitter Sentiment Demo", layout="centered", page_icon="🐦")
+st.set_page_config(page_title="Product Sentiment Demo", layout="centered", page_icon="🛍️")
 
 # Injecting Custom CSS
 st.markdown("""
 <style>
-    /* Premium aesthetics for Streamlit */
-    
-    /* Global background */
     .stApp {
         background: linear-gradient(135deg, #0d0e15 0%, #1a1c29 100%);
         color: #ffffff;
         font-family: 'Inter', 'Roboto', sans-serif;
     }
-    
-    /* Title styling */
     h1 {
         font-size: 3rem !important;
         font-weight: 800;
-        background: -webkit-linear-gradient(45deg, #3498db, #9b59b6);
+        background: -webkit-linear-gradient(45deg, #00c6ff, #0072ff);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
         margin-bottom: 0px !important;
         padding-bottom: 10px;
     }
-    
-    /* Subtitle styling */
     .subtitle {
         text-align: center;
         color: #a0a5b5;
@@ -37,8 +29,6 @@ st.markdown("""
         margin-bottom: 40px;
         font-weight: 300;
     }
-    
-    /* Glassmorphism container for text area */
     div[data-baseweb="textarea"] {
         background: rgba(255, 255, 255, 0.03) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -47,16 +37,14 @@ st.markdown("""
         transition: all 0.3s ease;
     }
     div[data-baseweb="textarea"]:focus-within {
-        border: 1px solid rgba(52, 152, 219, 0.5) !important;
-        box-shadow: 0 0 20px rgba(52, 152, 219, 0.15);
+        border: 1px solid rgba(0, 198, 255, 0.5) !important;
+        box-shadow: 0 0 20px rgba(0, 198, 255, 0.15);
     }
     div[data-baseweb="textarea"] textarea {
         color: #ffffff !important;
     }
-    
-    /* Button styling */
     div.stButton > button {
-        background: linear-gradient(90deg, #3498db 0%, #9b59b6 100%);
+        background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
         color: white;
         border: none;
         padding: 0.6rem 2rem;
@@ -66,15 +54,13 @@ st.markdown("""
         transition: all 0.3s ease;
         display: block;
         margin: 0 auto;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
     }
     div.stButton > button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+        box-shadow: 0 8px 25px rgba(0, 198, 255, 0.5);
         color: white;
     }
-    
-    /* Result card */
     .result-card {
         padding: 25px;
         border-radius: 15px;
@@ -90,6 +76,10 @@ st.markdown("""
         background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.2) 100%);
         border: 1px solid rgba(231, 76, 60, 0.3);
     }
+    .result-neutral {
+        background: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(243, 156, 18, 0.2) 100%);
+        border: 1px solid rgba(241, 196, 15, 0.3);
+    }
     .result-icon {
         font-size: 4rem;
         margin-bottom: 10px;
@@ -99,7 +89,6 @@ st.markdown("""
         font-weight: 700;
         margin-bottom: 5px;
     }
-    
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -107,57 +96,43 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Application UI
-st.markdown("<h1>Twitter Sentiment Live Demo</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Analyze the emotional tone of any tweet instantly.</div>", unsafe_allow_html=True)
+st.markdown("<h1>Product Sentiment Analyzer</h1>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Analyze customer feedback (Positive / Negative / Neutral).</div>", unsafe_allow_html=True)
 
-# Load Models
-@st.cache_resource
-def load_models():
-    try:
-        model = pickle.load(open("svm_model.pkl", "rb"))
-        vectorizer = pickle.load(open("tfidf_vectorizer.pkl", "rb"))
-        return model, vectorizer
-    except FileNotFoundError:
-        st.error("Model files not found. Please train the model first.")
-        return None, None
+analyzer = SentimentIntensityAnalyzer()
 
-model, vectorizer = load_models()
-
-def clean_tweet_fn(tweet_text):
-    # Remove user tags
-    tweet_text = re.sub(r"@[\\w]*", "", tweet_text)
-    # Remove special characters
-    tweet_text = re.sub(r"[^a-zA-Z#]", " ", tweet_text)
-    # Remove short words
-    cleaned = " ".join([w for w in str(tweet_text).split() if len(w) > 3])
-    return cleaned
-
-tweet = st.text_area("Enter your tweet below:", height=150, placeholder="What's happening?")
+tweet = st.text_area("Enter customer review/tweet below:", height=150, placeholder="e.g., I absolutely love this product! It's amazing.")
 
 if st.button("Analyze Sentiment"):
     if tweet.strip() == "":
-        st.warning("Please enter a tweet to analyze.")
-    elif model is not None and vectorizer is not None:
+        st.warning("Please enter some text to analyze.")
+    else:
         with st.spinner("Analyzing..."):
-            cleaned = clean_tweet_fn(tweet)
-            vector = vectorizer.transform([cleaned])
-            prediction = model.predict(vector)[0]
+            scores = analyzer.polarity_scores(tweet)
+            compound_score = scores['compound']
             
-            if prediction == 0:
-                html_str = """
+            if compound_score >= 0.05:
+                html_str = f"""
                 <div class="result-card result-positive">
-                    <div class="result-icon">✨</div>
-                    <div class="result-title" style="color: #2ecc71;">Normal Tweet</div>
-                    <div style="color: #a0a5b5;">This tweet appears to be normal / non-toxic.</div>
+                    <div class="result-icon">😍</div>
+                    <div class="result-title" style="color: #2ecc71;">Positive Feedback</div>
+                    <div style="color: #a0a5b5;">This customer is happy! (Score: {compound_score:.2f})</div>
+                </div>
+                """
+            elif compound_score <= -0.05:
+                html_str = f"""
+                <div class="result-card result-negative">
+                    <div class="result-icon">😡</div>
+                    <div class="result-title" style="color: #e74c3c;">Negative Feedback</div>
+                    <div style="color: #a0a5b5;">This customer is unhappy. (Score: {compound_score:.2f})</div>
                 </div>
                 """
             else:
-                html_str = """
-                <div class="result-card result-negative">
-                    <div class="result-icon">⚠️</div>
-                    <div class="result-title" style="color: #e74c3c;">Toxic / Negative Tweet</div>
-                    <div style="color: #a0a5b5;">This tweet contains toxic, racist, or sexist language.</div>
+                html_str = f"""
+                <div class="result-card result-neutral">
+                    <div class="result-icon">😐</div>
+                    <div class="result-title" style="color: #f1c40f;">Neutral Feedback</div>
+                    <div style="color: #a0a5b5;">This customer is feeling neutral. (Score: {compound_score:.2f})</div>
                 </div>
                 """
-            st.markdown(html_str, unsafe_allow_html=True)
+            st.markdown(html_str, unsafe_allow_html=True)kdown(html_str, unsafe_allow_html=True)
