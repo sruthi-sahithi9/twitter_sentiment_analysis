@@ -2,7 +2,7 @@ import streamlit as st
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 # Set page config
-st.set_page_config(page_title="Twitter Sentiment Demo", layout="centered", page_icon="🛍️")
+st.set_page_config(page_title="Twitter Sentiment Demo", layout="centered", page_icon="🐦")
 
 # Injecting Custom CSS
 st.markdown("""
@@ -97,11 +97,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("<h1>Twitter Sentiment Analyzer</h1>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Analyze customer feedback (Positive / Negative / Neutral).</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Analyze Twitter sentiments (Positive / Negative / Neutral).</div>", unsafe_allow_html=True)
 
 analyzer = SentimentIntensityAnalyzer()
 
-tweet = st.text_area("Enter customer review/tweet below:", height=150, placeholder="e.g., I absolutely love this product! It's amazing.")
+tweet = st.text_area("Enter your tweet below:", height=150, placeholder="e.g., I absolutely love this! It's amazing.")
 
 if st.button("Analyze Sentiment"):
     if tweet.strip() == "":
@@ -115,24 +115,24 @@ if st.button("Analyze Sentiment"):
                 html_str = f"""
                 <div class="result-card result-positive">
                     <div class="result-icon">😍</div>
-                    <div class="result-title" style="color: #2ecc71;">Positive Feedback</div>
-                    <div style="color: #a0a5b5;">This customer is happy! (Score: {compound_score:.2f})</div>
+                    <div class="result-title" style="color: #2ecc71;">Positive Tweet</div>
+                    <div style="color: #ffffff; font-size: 1.2rem; font-weight: 500;">This tweet is positive! (Score: {compound_score:.2f})</div>
                 </div>
                 """
             elif compound_score <= -0.05:
                 html_str = f"""
                 <div class="result-card result-negative">
                     <div class="result-icon">😡</div>
-                    <div class="result-title" style="color: #e74c3c;">Negative Feedback</div>
-                    <div style="color: #a0a5b5;">This customer is unhappy. (Score: {compound_score:.2f})</div>
+                    <div class="result-title" style="color: #e74c3c;">Negative Tweet</div>
+                    <div style="color: #ffffff; font-size: 1.2rem; font-weight: 500;">This tweet is negative. (Score: {compound_score:.2f})</div>
                 </div>
                 """
             else:
                 html_str = f"""
                 <div class="result-card result-neutral">
                     <div class="result-icon">😐</div>
-                    <div class="result-title" style="color: #f1c40f;">Neutral Feedback</div>
-                    <div style="color: #a0a5b5;">This customer is feeling neutral. (Score: {compound_score:.2f})</div>
+                    <div class="result-title" style="color: #f1c40f;">Neutral Tweet</div>
+                    <div style="color: #ffffff; font-size: 1.2rem; font-weight: 500;">This tweet is feeling neutral. (Score: {compound_score:.2f})</div>
                 </div>
                 """
             st.markdown(html_str, unsafe_allow_html=True)
